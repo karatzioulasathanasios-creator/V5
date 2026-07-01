@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>SINTELIA Pulse v5.2 — OPS Market Analysis Terminal</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
-<meta name="apple-mobile-web-app-title" content="SINTELIA PULSE v5">
+<meta name="apple-mobile-web-app-title" content="SINTELIA PULSE v5.2">
 <meta name="theme-color" content="#ffffff">
 <style>
 :root{--bg:#fff;--text:#111827;--muted:#6b7280;--line:#e5e7eb;--soft:#f9fafb;--green:#168a3a;--green2:#eaf8ef;--yellow:#f6b700;--yellow2:#fff8df;--red:#d71920;--red2:#fff0f0;--blue:#0b72ff;--blue2:#eef5ff;--card:#fff;--shadow:0 10px 30px rgba(0,0,0,.06)}
@@ -147,7 +147,7 @@
 // ============================================================
 // Layer 1 (OPS) remains UNCHANGED from v4.2
 // Phase B.1: 9 models, full metrics, AIC/BIC, model ranking
-// Fixed: non-linear models with clamping, NaN/Infinity protection
+// Fixed: Syntax errors, non-linear model clamping, edge cases
 // ============================================================
 
 // ============================================================
@@ -364,8 +364,8 @@ const FinancialGeometry = {
       const sx2 = X2.reduce((a,b)=>a+b,0);
       const sx3 = X3.reduce((a,b)=>a+b,0);
       const sx4 = X2.reduce((a,b)=>a+b*b,0);
-      const sx5 = x.reduce((a,b)=>a+Math.pow(b,5),0);
-      const sx6 = x.reduce((a,b)=>a+Math.pow(b,6),0);
+      const sx5 = X2.reduce((a,b)=>a*b*b*b,0);
+      const sx6 = X2.reduce((a,b)=>a*b*b*b*b,0);
       const sxy = x.reduce((a,i)=>a+i*y[i],0);
       const sx2y = X2.reduce((a,i)=>a+i*y[i],0);
       const sx3y = X3.reduce((a,i)=>a+i*y[i],0);
@@ -419,8 +419,7 @@ const FinancialGeometry = {
     const n = x.length;
     if (n < 5) return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
     const yMax = Math.max(...y);
-    const yMin = Math.min(...y);
-    const yRange = yMax - yMin;
+    const yRange = yMax - Math.min(...y);
     if (yRange < 1e-12) return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
     const L = yMax * 1.05;
     // Safe log transform: clamp ratio to avoid NaN
@@ -456,8 +455,7 @@ const FinancialGeometry = {
     const n = x.length;
     if (n < 5) return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
     const yMax = Math.max(...y);
-    const yMin = Math.min(...y);
-    const yRange = yMax - yMin;
+    const yRange = yMax - Math.min(...y);
     if (yRange < 1e-12) return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
     const a = yMax * 1.1;
     // Safe: clamp ratio between 0.001 and 0.999
@@ -562,8 +560,7 @@ const FinancialGeometry = {
   },
   calcAICBIC: (rss, n, k) => {
     if (rss < 1e-12) return { aic: -Infinity, bic: -Infinity };
-    const safeRSS = Math.max(rss, 1e-12);
-    const logL = -n/2 * (Math.log(2 * Math.PI * safeRSS / n) + 1);
+    const logL = -n/2 * (Math.log(2 * Math.PI * rss / n) + 1);
     const aic = -2 * logL + 2 * k;
     const bic = -2 * logL + k * Math.log(n);
     return { aic, bic };
@@ -1040,9 +1037,23 @@ const DataEngine={timestamps:[],currentSymbol:CONFIG.SYMBOL,price:[],high:[],low
 };
 
 // ============================================================
-// OPS ENGINE (ΑΜΕΤΑΒΛΗΤΟ)
+// OPS ENGINE (ΑΜΕΤΑΒΛΗΤΟ — ΔΙΟΡΘΩΜΕΝΟ SYNTAX)
 // ============================================================
-const OPSEngine={analyze(channels){const r=Utils.runOPSPipeline(channels);if(!r)return{score:0,PCS:0,PCS_z:0,Pi:0,SCG:0,rolling:0,axiom:'WARMUP',reasons:['PIPELINE_FAILED'],decision:'INCONCLUSIVE',passes:{pcs:false,pcs_z:false,pi:false,scg:false,persistence:false,axiom:false}};const T=CONFIG.THRESHOLDS;const pcsPass=r.PCS>=T.PCS,pcsZPass=r.PCS_z>=T.PCS_z,piPass=r.Pi>=T.Pi,scgPass=r.SCG>=T.SCG,rollingPass=r.rolling>=T.rolling,axiomPass=r.axiom==='PASS';let score=0,reasons=[];if(pcsZPass){score+=22;reasons.push('PCS_z PASS')}else reasons.push('PCS_z FAIL');if(piPass){score+=20;reasons.push('Π PASS')}else reasons.push('Π FAIL');if(scgPass){score+=18;reasons.push('SCG PASS')}else reasons.push('SCG FAIL');if(rollingPass){score+=20;reasons.push('ROLLING PASS')}else reasons.push('ROLLING FAIL');if(axiomPass){score+=15;reasons.push('AXIOM A PASS')}else if(r.axiom==='HOLD'){score+=7;reasons.push('AXIOM A HOLD')}else reasons.push('AXIOM A FAIL');const decision=(score>=80&&pcsPass&&pcsZPass&&piPass&&scgPass&&rollingPass)?'PASS':(score>=55&&pcsPass&&piPass&&rollingPass?'INCONCLUSIVE':'FAIL');return{...r,PCS:+r.PCS.toFixed(3),PCS_z:+r.PCS_z.toFixed(3),Pi:+r.Pi.toFixed(3),SCG:+r.SCG.toFixed(3),rolling:+r.rolling.toFixed(2),score,confRaw:score/100,reasons,decision,passes:{pcs:pcsPass,pcs_z:pcsZPass,pi:piPass,scg:scgPass,persistence:rollingPass,axiom:axiomPass},_fullResult:r, nullPCS: 0, nullPass: false};}};
+const OPSEngine={analyze(channels){const r=Utils.runOPSPipeline(channels);if(!r)return{score:0,PCS:0,PCS_z:0,Pi:0,SCG:0,rolling:0,axiom:'WARMUP',reasons:['PIPELINE_FAILED'],decision:'INCONCLUSIVE',passes:{pcs:false,pcs_z:false,pi:false,scg:false,persistence:false,axiom:false}};const T=CONFIG.THRESHOLDS;const pcsPass=r.PCS>=T.PCS,pcsZPass=r.PCS_z>=T.PCS_z,piPass=r.Pi>=T.Pi,scgPass=r.SCG>=T.SCG,rollingPass=r.rolling>=T.rolling,axiomPass=r.axiom==='PASS';let score=0,reasons=[];if(pcsZPass){score+=22;reasons.push('PCS_z PASS')}else reasons.push('PCS_z FAIL');if(piPass){score+=20;reasons.push('Π PASS')}else reasons.push('Π FAIL');if(scgPass){score+=18;reasons.push('SCG PASS')}else reasons.push('SCG FAIL');if(rollingPass){score+=20;reasons.push('ROLLING PASS')}else reasons.push('ROLLING FAIL');if(axiomPass){score+=15;reasons.push('AXIOM A PASS')}else if(r.axiom==='HOLD'){score+=7;reasons.push('AXIOM A HOLD')}else reasons.push('AXIOM A FAIL');const decision=(score>=80&&pcsPass&&pcsZPass&&piPass&&scgPass&&rollingPass)?'PASS':(score>=55&&pcsPass&&piPass&&rollingPass?'INCONCLUSIVE':'FAIL');return{
+  PCS:+r.PCS.toFixed(3),
+  PCS_z:+r.PCS_z.toFixed(3),
+  Pi:+r.Pi.toFixed(3),
+  SCG:+r.SCG.toFixed(3),
+  rolling:+r.rolling.toFixed(2),
+  score,
+  confRaw:score/100,
+  reasons,
+  decision,
+  passes:{pcs:pcsPass,pcs_z:pcsZPass,pi:piPass,scg:scgPass,persistence:rollingPass,axiom:axiomPass},
+  _fullResult:r,
+  nullPCS:0,
+  nullPass:false
+}}};
 
 // ============================================================
 // MEMORY ENGINE
@@ -1071,7 +1082,7 @@ let AUDIT=[];const AuditEngine={isActive:false,load:()=>{try{AUDIT=JSON.parse(lo
 const UI={
   updateMarket:(open,info)=>{Utils.el('marketStatus').textContent=open?'● OPEN':'● CLOSED';Utils.el('marketStatus').className='big '+(open?'green':'red');Utils.el('marketTag').textContent=open?'OPEN':'CLOSED';Utils.el('marketExchange').textContent=info.exchange;Utils.el('marketWindow').textContent=info.window;Utils.el('marketDays').textContent=info.days;Utils.el('exchangeDisplay').textContent=info.exchange;Utils.el('marketTZ').textContent=info.tz;Utils.el('timezoneLabel').textContent=info.tz;Utils.el('nextOpenLabel').textContent=open?'Next close':'Next open';Utils.el('nextOpen').textContent=open?(info.closeTime||'17:30'):'—';Utils.el('nextOpenTime').textContent=open?'closes today':(info.openTime||'09:00');Utils.el('gateTitle').textContent=open?'MARKET OPEN':'MARKET CLOSED';Utils.el('gateStatus').textContent=open?'OPS ACTIVE':'OPS PAUSED';Utils.el('gateText').textContent=open?'OPS, Memory and Audit are running.':'All OPS operations are paused until market opens.';Utils.el('regimePill').textContent='REGIME: '+(open?'ACTIVE':'PAUSED');Utils.el('regimePill').className='pill '+(open?'ok':'gray')},
   updateDecision:(d,r,c,open)=>{const el=Utils.el('stateDisplay');el.textContent=d;el.className='state '+d.toLowerCase();Utils.el('signalDisplay').textContent=d==='GO'?'OPS STRUCTURE DETECTED — NOT BUY SIGNAL':d==='ARM'?'ARMING':'WAIT';Utils.el('confFill').style.width=Math.round(c*100)+'%';Utils.el('confPct').textContent=Math.round(c*100)+'%';Utils.el('confSub').textContent=open?'ACTIVE':'PAUSED'},
-  updateOPS:(ops,nr)=>{Utils.el('pcsV').textContent=ops.PCS.toFixed(3);Utils.el('pcsZV').textContent=ops.PCS_z.toFixed(3);Utils.el('piV').textContent=ops.Pi.toFixed(3);Utils.el('scgV').textContent=ops.SCG.toFixed(3);Utils.el('rollingV').textContent=ops.rolling.toFixed(2);const set=(id,p)=>{const e=Utils.el(id);e.textContent=p?'PASS':'FAIL';e.className='pass '+(p?'ok':'fail')};set('pcsPass',ops.PCS>=CONFIG.THRESHOLDS.PCS);set('pcsZPass',ops.PCS_z>=CONFIG.THRESHOLDS.PCS_z);set('piPass',ops.Pi>=CONFIG.THRESHOLDS.Pi);set('scgPass',ops.SCG>=CONFIG.THRESHOLDS.SCG);set('rollingPass',ops.rolling>=CONFIG.THRESHOLDS.rolling);Utils.el('nullV').textContent=nr.nullPass?'PASS':'FAIL';Utils.el('nullV').className='val '+(nr.nullPass?'green':'red');Utils.el('nullPass').textContent=`p=${nr.pPCS.toFixed(3)}`;Utils.el('nullPass').className='pass '+(nr.nullPass?'ok':'fail');Utils.el('opsDecisionV').textContent=ops.decision;Utils.el('opsDecisionV').className='val '+(ops.decision==='PASS'?'green':ops.decision==='INCONCLUSIVE'?'yellow':'red');Utils.el('opsDecisionPass').textContent=ops.decision;Utils.el('opsDecisionPass').className='pass '+(ops.decision==='PASS'?'ok':ops.decision==='INCONCLUSIVE'?'warn':'fail');Utils.el('axiomPill').textContent='AXIOM A: '+ops.axiom;Utils.el('opsPill').textContent=`OPS: ${ops.decision} • PCS=${ops.PCS.toFixed(3)} • PCS_z=${ops.PCS_z.toFixed(3)} • Π=${ops.Pi.toFixed(3)} • SCG=${ops.SCG.toFixed(3)}`;Utils.el('nullPill').textContent=`NULL: ${nr.decision} (p=${nr.pPCS.toFixed(3)})`;Utils.el('nullPill').className='pill '+(nr.decision==='PASS'?'ok':nr.decision==='INCONCLUSIVE'?'warn':'gray');const keyMap={price:'chPrice',volume:'chVolume',range:'chRange',return:'chReturn',volatility:'chVolatility'};ops.channelNames?.forEach((k,i)=>{const e=Utils.el(keyMap[k]);if(e){const v=ops.loadings[i]||0;e.textContent=v.toFixed(3);e.style.color=v>0?'var(--green)':v<0?'var(--red)':'var(--muted)'}})},
+  updateOPS:(ops,nr)=>{Utils.el('pcsV').textContent=ops.PCS||'—';Utils.el('pcsZV').textContent=ops.PCS_z||'—';Utils.el('piV').textContent=ops.Pi||'—';Utils.el('scgV').textContent=ops.SCG||'—';Utils.el('rollingV').textContent=ops.rolling||'—';const set=(id,p)=>{const e=Utils.el(id);e.textContent=p?'PASS':'FAIL';e.className='pass '+(p?'ok':'fail')};set('pcsPass',ops.PCS>=CONFIG.THRESHOLDS.PCS);set('pcsZPass',ops.PCS_z>=CONFIG.THRESHOLDS.PCS_z);set('piPass',ops.Pi>=CONFIG.THRESHOLDS.Pi);set('scgPass',ops.SCG>=CONFIG.THRESHOLDS.SCG);set('rollingPass',ops.rolling>=CONFIG.THRESHOLDS.rolling);Utils.el('nullV').textContent=nr.nullPass?'PASS':'FAIL';Utils.el('nullV').className='val '+(nr.nullPass?'green':'red');Utils.el('nullPass').textContent=`p=${nr.pPCS.toFixed(3)}`;Utils.el('nullPass').className='pass '+(nr.nullPass?'ok':'fail');Utils.el('opsDecisionV').textContent=ops.decision;Utils.el('opsDecisionV').className='val '+(ops.decision==='PASS'?'green':ops.decision==='INCONCLUSIVE'?'yellow':'red');Utils.el('opsDecisionPass').textContent=ops.decision;Utils.el('opsDecisionPass').className='pass '+(ops.decision==='PASS'?'ok':ops.decision==='INCONCLUSIVE'?'warn':'fail');Utils.el('axiomPill').textContent='AXIOM A: '+ops.axiom;Utils.el('opsPill').textContent=`OPS: ${ops.decision} • PCS=${ops.PCS} • PCS_z=${ops.PCS_z} • Π=${ops.Pi} • SCG=${ops.SCG}`;Utils.el('nullPill').textContent=`NULL: ${nr.decision} (p=${nr.pPCS.toFixed(3)})`;Utils.el('nullPill').className='pill '+(nr.decision==='PASS'?'ok':nr.decision==='INCONCLUSIVE'?'warn':'gray');const keyMap={price:'chPrice',volume:'chVolume',range:'chRange',return:'chReturn',volatility:'chVolatility'};ops.channelNames?.forEach((k,i)=>{const e=Utils.el(keyMap[k]);if(e){const v=ops.loadings[i]||0;e.textContent=v.toFixed(3);e.style.color=v>0?'var(--green)':v<0?'var(--red)':'var(--muted)'}})},
   updateNull:n=>{Utils.el('pPCS').textContent=n.pPCS.toFixed(3);Utils.el('pPi').textContent=n.pPi.toFixed(3);Utils.el('pSCG').textContent=n.pSCG.toFixed(3);Utils.el('nullDecision').textContent=n.decision;Utils.el('nullDecision').style.color=n.decision==='PASS'?'var(--green)':n.decision==='INCONCLUSIVE'?'var(--yellow)':'var(--red)'},
   updateMemory:m=>{Utils.el('nearCases').textContent=m.n||0;Utils.el('memVerdict').textContent=m.top||'—';Utils.el('memConf').textContent=Math.round((m.memConf||0)*100)+'%';Utils.el('memGuard').textContent=m.guard||'—';Utils.el('memExplain').textContent=`GO ${m.counts?.GO||0} • ARM ${m.counts?.ARM||0} • HOLD ${m.counts?.HOLD||0} among nearest stored cases`},
   updateMemoryTable:()=>{const rows=MEMORY.decisions.slice(-20).reverse().map(x=>`<tr><td>${new Date(x.t).toLocaleTimeString('el-GR')}</td><td><span class="${x.verdict==='GO'?'badgeGo':x.verdict==='ARM'?'badgeArm':'badgeHold'}">${x.verdict}</span></td><td>${Math.round((x.confidence||0)*100)}</td><td>${Number(x.PCS||0).toFixed(3)}</td><td>${Number(x.Pi||0).toFixed(3)}</td><td>${Number(x.SCG||0).toFixed(3)}</td></tr>`).join('');Utils.el('memoryRows').innerHTML=rows||'<tr><td colspan="6">No memory yet</td></tr>';Utils.el('memV').textContent=MEMORY.decisions.length;Utils.el('memK').textContent=`GO ${MEMORY.decisions.filter(x=>x.verdict==='GO').length} • ARM ${MEMORY.decisions.filter(x=>x.verdict==='ARM').length} • HOLD ${MEMORY.decisions.filter(x=>x.verdict==='HOLD').length}`},
@@ -1079,7 +1090,8 @@ const UI={
   updateStability:h=>{if(h.length<5){Utils.el('stabilityPill').textContent='STABILITY: LEARNING';Utils.el('stabilityPill').className='pill gray';return}const stable=new Set(h.slice(-10)).size<=2;Utils.el('stabilityPill').textContent='STABILITY: '+(stable?'STABLE':'UNSTABLE');Utils.el('stabilityPill').className='pill '+(stable?'ok':'warn')},
   updateLayer0:(l0)=>{if(!l0)return;Utils.el('dqFeed').textContent=l0.feedQuality||'—';Utils.el('dqMissing').textContent=l0.missingCandles||'—';Utils.el('dqGaps').textContent=l0.gaps||'—';Utils.el('dqOutliers').textContent=l0.outliers||'—';Utils.el('dqSampling').textContent=l0.samplingDrift||'—';Utils.el('dqDrift').textContent=l0.samplingDrift||'—';Utils.el('dqScore').textContent=l0.score||'—';Utils.el('dqStatus').textContent=l0.status||'—';Utils.el('dqStatus').style.color=l0.status==='GOOD'?'var(--green)':l0.status==='FAIR'?'var(--yellow)':'var(--red)'},
   updateLayer1:(ops)=>{if(!ops)return;Utils.el('l1OpsDecision').textContent=ops.decision||'—';Utils.el('l1OpsDecision').style.color=ops.decision==='PASS'?'var(--green)':ops.decision==='INCONCLUSIVE'?'var(--yellow)':'var(--red)';Utils.el('l1PCS').textContent=ops.PCS||'—';Utils.el('l1PCSz').textContent=ops.PCS_z||'—';Utils.el('l1Pi').textContent=ops.Pi||'—';Utils.el('l1SCG').textContent=ops.SCG||'—';Utils.el('l1Rolling').textContent=ops.rolling||'—';Utils.el('l1Axiom').textContent=ops.axiom||'—';Utils.el('l1Axiom').style.color=ops.axiom==='PASS'?'var(--green)':ops.axiom==='HOLD'?'var(--yellow)':'var(--red)';Utils.el('l1Null').textContent=ops.nullDecision||'—';Utils.el('l1Null').style.color=ops.nullDecision==='PASS'?'var(--green)':ops.nullDecision==='INCONCLUSIVE'?'var(--yellow)':'var(--red)';Utils.el('l1Guard').textContent=ops.guard||'—'},
-  updateLayer2:(l2)=>{if(!l2)return;Utils.el('l2BestFit').textContent=l2.bestFit||'—';Utils.el('l2R2').textContent=l2.r2?l2.r2.toFixed(4):'—';Utils.el('l2AdjR2').textContent=l2.adjR2?l2.adjR2.toFixed(4):'—';Utils.el('l2RMSE').textContent=l2.rmse?l2.rmse.toFixed(4):'—';Utils.el('l2MAE').textContent=l2.mae?l2.mae.toFixed(4):'—';Utils.el('l2MedAE').textContent=l2.medae?l2.medae.toFixed(4):'—';Utils.el('l2AIC').textContent=l2.aic?l2.aic.toFixed(2):'—';Utils.el('l2BIC').textContent=l2.bic?l2.bic.toFixed(2):'—';Utils.el('l2Curvature').textContent=l2.curvature?l2.curvature.toFixed(4):'—';Utils.el('l2Slope').textContent=l2.slope?l2.slope.toFixed(4):'—';Utils.el('l2Acceleration').textContent=l2.acceleration?l2.acceleration.toFixed(4):'—';Utils.el('l2Jerk').textContent=l2.jerk?l2.jerk.toFixed(4):'—';Utils.el('l2Inflection').textContent=l2.inflectionPoints||'—';Utils.el('l2Turning').textContent=l2.turningPoints||'—';Utils.el('l2Hurst').textContent=l2.hurst?l2.hurst.toFixed(4):'—';Utils.el('l2Fractal').textContent=l2.fractalDimension?l2.fractalDimension.toFixed(4):'—';Utils.el('l2Persistence').textContent=l2.persistence||'—';Utils.el('l2Persistence').style.color=l2.persistence==='PERSISTENT'?'var(--green)':l2.persistence==='ANTI-PERSISTENT'?'var(--red)':'var(--yellow)';
+  updateLayer2:(l2)=>{if(!l2)return;Utils.el('l2BestFit').textContent=l2.bestFit||'—';Utils.el('l2R2').textContent=l2.r2?l2.r2.toFixed(4):'—';Utils.el('l2AdjR2').textContent=l2.adjR2?l2.adjR2.toFixed(4):'—';Utils.el('l2RMSE').textContent=l2.rmse?l2.rmse.toFixed(4):'—';Utils.el('l2MAE').textContent=l2.mae?l2.mae.toFixed(4):'—';Utils.el('l2MedAE').textContent=l2.medae?l2.medae.toFixed(4):'—';Utils.el('l2AIC').textContent=l2.aic?l2.aic.toFixed(2):'—';Utils.el('l2BIC').textContent=l2.bic?l2.bic.toFixed(2):'—';Utils.el('l2Curvature').textContent=l2.curvature?l2.curvature.toFixed(4):'—';Utils.el('l2Slope').textContent=l2.slope?l2.slope.toFixed(4):'—';Utils.el('l2Acceleration').textContent=l2.acceleration?l2.acceleration.toFixed(4):'—';Utils.el('l2Jerk').textContent=l2.jerk?l2.jerk.toFixed(4):'—';Utils.el('l2Inflection').textContent=l2.inflectionPoints||'—';Utils.el('l2Turning').textContent=l2.turningPoints||'—';Utils.el('l2Hurst').textContent=l2.hurst?l2.hurst.toFixed(4):'—';Utils.el('l2Fractal').textContent=l2.fractalDimension?l2.fractalDimension.toFixed(4):'—';
+    const pEl=Utils.el('l2Persistence');if(pEl){pEl.textContent=l2.persistence||'—';pEl.style.color=l2.persistence==='PERSISTENT'?'var(--green)':l2.persistence==='ANTI-PERSISTENT'?'var(--red)':'var(--yellow)';}
     // Model ranking table
     if(l2.models && l2.models.length>0){
       let html = '<table class="model-table"><tr><th class="name">Model</th><th>R²</th><th>AdjR²</th><th>RMSE</th><th>MAE</th><th>MedAE</th><th>AIC</th><th>BIC</th><th class="rank">Rank</th></tr>';
