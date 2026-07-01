@@ -364,8 +364,8 @@ const FinancialGeometry = {
       const sx2 = X2.reduce((a,b)=>a+b,0);
       const sx3 = X3.reduce((a,b)=>a+b,0);
       const sx4 = X2.reduce((a,b)=>a+b*b,0);
-      const sx5 = X2.reduce((a,b)=>a*b*b*b,0);
-      const sx6 = X2.reduce((a,b)=>a*b*b*b*b,0);
+      const sx5 = x.reduce((a,b)=>a+Math.pow(b,5),0);
+      const sx6 = x.reduce((a,b)=>a+Math.pow(b,6),0);
       const sxy = x.reduce((a,i)=>a+i*y[i],0);
       const sx2y = X2.reduce((a,i)=>a+i*y[i],0);
       const sx3y = X3.reduce((a,i)=>a+i*y[i],0);
@@ -562,7 +562,8 @@ const FinancialGeometry = {
   },
   calcAICBIC: (rss, n, k) => {
     if (rss < 1e-12) return { aic: -Infinity, bic: -Infinity };
-    const logL = -n/2 * (Math.log(2 * Math.PI * rss / n) + 1);
+    const safeRSS = Math.max(rss, 1e-12);
+    const logL = -n/2 * (Math.log(2 * Math.PI * safeRSS / n) + 1);
     const aic = -2 * logL + 2 * k;
     const bic = -2 * logL + k * Math.log(n);
     return { aic, bic };
@@ -1041,7 +1042,7 @@ const DataEngine={timestamps:[],currentSymbol:CONFIG.SYMBOL,price:[],high:[],low
 // ============================================================
 // OPS ENGINE (ΑΜΕΤΑΒΛΗΤΟ)
 // ============================================================
-const OPSEngine={analyze(channels){const r=Utils.runOPSPipeline(channels);if(!r)return{score:0,PCS:0,PCS_z:0,Pi:0,SCG:0,rolling:0,axiom:'WARMUP',reasons:['PIPELINE_FAILED'],decision:'INCONCLUSIVE',passes:{pcs:false,pcs_z:false,pi:false,scg:false,persistence:false,axiom:false}};const T=CONFIG.THRESHOLDS;const pcsPass=r.PCS>=T.PCS,pcsZPass=r.PCS_z>=T.PCS_z,piPass=r.Pi>=T.Pi,scgPass=r.SCG>=T.SCG,rollingPass=r.rolling>=T.rolling,axiomPass=r.axiom==='PASS';let score=0,reasons=[];if(pcsZPass){score+=22;reasons.push('PCS_z PASS')}else reasons.push('PCS_z FAIL');if(piPass){score+=20;reasons.push('Π PASS')}else reasons.push('Π FAIL');if(scgPass){score+=18;reasons.push('SCG PASS')}else reasons.push('SCG FAIL');if(rollingPass){score+=20;reasons.push('ROLLING PASS')}else reasons.push('ROLLING FAIL');if(axiomPass){score+=15;reasons.push('AXIOM A PASS')}else if(r.axiom==='HOLD'){score+=7;reasons.push('AXIOM A HOLD')}else reasons.push('AXIOM A FAIL');const decision=(score>=80&&pcsPass&&pcsZPass&&piPass&&scgPass&&rollingPass)?'PASS':(score>=55&&pcsPass&&piPass&&rollingPass?'INCONCLUSIVE':'FAIL');return{...r,PCS:+r.PCS.toFixed(3),PCS_z:+r.PCS_z.toFixed(3),Pi:+r.Pi.toFixed(3),SCG:+r.SCG.toFixed(3),rolling:+r.rolling.toFixed(2),score,confRaw:score/100,reasons,decision,passes:{pcs:pcsPass,pcs_z:pcsZPass,pi:piPass,scg:scgPass,persistence:rollingPass,axiom:axiomPass},_fullResult:r, nullPCS: 0, nullPass: false}};
+const OPSEngine={analyze(channels){const r=Utils.runOPSPipeline(channels);if(!r)return{score:0,PCS:0,PCS_z:0,Pi:0,SCG:0,rolling:0,axiom:'WARMUP',reasons:['PIPELINE_FAILED'],decision:'INCONCLUSIVE',passes:{pcs:false,pcs_z:false,pi:false,scg:false,persistence:false,axiom:false}};const T=CONFIG.THRESHOLDS;const pcsPass=r.PCS>=T.PCS,pcsZPass=r.PCS_z>=T.PCS_z,piPass=r.Pi>=T.Pi,scgPass=r.SCG>=T.SCG,rollingPass=r.rolling>=T.rolling,axiomPass=r.axiom==='PASS';let score=0,reasons=[];if(pcsZPass){score+=22;reasons.push('PCS_z PASS')}else reasons.push('PCS_z FAIL');if(piPass){score+=20;reasons.push('Π PASS')}else reasons.push('Π FAIL');if(scgPass){score+=18;reasons.push('SCG PASS')}else reasons.push('SCG FAIL');if(rollingPass){score+=20;reasons.push('ROLLING PASS')}else reasons.push('ROLLING FAIL');if(axiomPass){score+=15;reasons.push('AXIOM A PASS')}else if(r.axiom==='HOLD'){score+=7;reasons.push('AXIOM A HOLD')}else reasons.push('AXIOM A FAIL');const decision=(score>=80&&pcsPass&&pcsZPass&&piPass&&scgPass&&rollingPass)?'PASS':(score>=55&&pcsPass&&piPass&&rollingPass?'INCONCLUSIVE':'FAIL');return{...r,PCS:+r.PCS.toFixed(3),PCS_z:+r.PCS_z.toFixed(3),Pi:+r.Pi.toFixed(3),SCG:+r.SCG.toFixed(3),rolling:+r.rolling.toFixed(2),score,confRaw:score/100,reasons,decision,passes:{pcs:pcsPass,pcs_z:pcsZPass,pi:piPass,scg:scgPass,persistence:rollingPass,axiom:axiomPass},_fullResult:r, nullPCS: 0, nullPass: false};}};
 
 // ============================================================
 // MEMORY ENGINE
