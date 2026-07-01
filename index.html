@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>SINTELIA Pulse v5.1 — OPS Market Analysis Terminal</title>
+<title>SINTELIA Pulse v5.2 — OPS Market Analysis Terminal</title>
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="SINTELIA PULSE v5">
 <meta name="theme-color" content="#ffffff">
@@ -14,12 +14,12 @@
 </head>
 <body>
 <div class="wrap">
-  <div class="header"><div><h1>SINTELIA Pulse <small>v5.1</small></h1><div class="sub">OPS Scientific Market Analysis Terminal • AAPL / VUAA.MI<br><b>PRICE • VOLUME • RANGE • RETURN • VOLATILITY</b></div><div class="asset-selector" id="assetSelector"><button class="asset-btn active" data-asset="AAPL">AAPL</button><button class="asset-btn" data-asset="VUAA.MI">VUAA.MI</button></div></div><div class="clock"><span id="timeNow">--:--:--</span><small id="timezoneLabel">America/New_York</small></div><div class="livecol"><div class="livebox"><span>LIVE</span><small id="health">health: CHECK</small><span class="dot" id="healthDot"></span></div><button class="refresh" id="refreshBtn">↻ Refresh Data</button></div></div>
+  <div class="header"><div><h1>SINTELIA Pulse <small>v5.2</small></h1><div class="sub">OPS Scientific Market Analysis Terminal • AAPL / VUAA.MI<br><b>PRICE • VOLUME • RANGE • RETURN • VOLATILITY</b></div><div class="asset-selector" id="assetSelector"><button class="asset-btn active" data-asset="AAPL">AAPL</button><button class="asset-btn" data-asset="VUAA.MI">VUAA.MI</button></div></div><div class="clock"><span id="timeNow">--:--:--</span><small id="timezoneLabel">America/New_York</small></div><div class="livecol"><div class="livebox"><span>LIVE</span><small id="health">health: CHECK</small><span class="dot" id="healthDot"></span></div><button class="refresh" id="refreshBtn">↻ Refresh Data</button></div></div>
   <div class="marketgrid"><div class="mcell"><div class="label">Market status</div><div class="big red" id="marketStatus">● CHECK</div><div class="small" id="marketExchange">NASDAQ</div></div><div class="mcell"><div class="label" id="nextOpenLabel">Next open</div><div class="big" id="nextOpen">—</div><div class="small" id="nextOpenTime">09:30</div></div><div class="mcell"><div class="label">Local time</div><div class="big" id="marketTime">—</div><div class="small" id="marketTZ">UTC</div></div><div class="mcell"><div class="label">Market window</div><div class="big" id="marketWindow">09:30 - 16:00</div><div class="small" id="marketDays">Mon - Fri</div></div></div>
   <div class="hero"><div class="lock">🔒</div><div><div class="state hold" id="stateDisplay">HOLD</div><div class="signal">SIGNAL: <span id="signalDisplay">WAIT</span></div></div><div class="gatebox"><b id="gateTitle">MARKET CLOSED</b><div class="danger" id="gateStatus">GO gate: DISABLED</div><div id="gateText">OPS is paused while market is closed.</div></div></div>
   <div class="pills"><div class="pill ok" id="axiomPill">AXIOM A: —</div><div class="pill blue" id="opsPill">OPS: —</div><div class="pill gray" id="regimePill">REGIME: —</div><div class="pill" id="stabilityPill">STABILITY: —</div><div class="pill" id="nullPill">NULL: —</div><div class="pill blue" id="channelsPill">CHANNELS: 5</div></div>
   <div class="main"><div class="card"><div class="price" id="priceDisplay">$ —</div><div><b id="symbolDisplay">AAPL</b> • <span id="exchangeDisplay">NASDAQ</span> • <span id="currencyDisplay">USD</span> <span class="tag" id="marketTag">CHECK</span></div><div class="small" id="prevClose">prev close: —</div><div class="confrow"><div><div class="label">Confidence</div><div class="bar"><div class="fill" id="confFill"></div></div><div class="confsub" id="confSub">LOW</div></div><div><div class="confnum" id="confPct">0%</div></div></div><div class="chartwrap"><canvas id="chart" width="900" height="260"></canvas></div><div class="minmax"><span>Min: <b id="minP">—</b></span><span>Max: <b id="maxP">—</b></span></div><div class="metrics"><div class="metric"><div class="name">PCS</div><div class="val" id="pcsV">—</div><div class="pass" id="pcsPass">—</div></div><div class="metric"><div class="name">PCS_z</div><div class="val" id="pcsZV">—</div><div class="pass" id="pcsZPass">—</div></div><div class="metric"><div class="name">Π (Pi)</div><div class="val" id="piV">—</div><div class="pass" id="piPass">—</div></div><div class="metric"><div class="name">SCG</div><div class="val" id="scgV">—</div><div class="pass" id="scgPass">—</div></div><div class="metric"><div class="name">Rolling Persistence</div><div class="val" id="rollingV">—</div><div class="pass" id="rollingPass">—</div></div><div class="metric"><div class="name">Null Exceedance</div><div class="val" id="nullV">—</div><div class="pass" id="nullPass">—</div></div><div class="metric"><div class="name">OPS Decision</div><div class="val" id="opsDecisionV">—</div><div class="pass" id="opsDecisionPass">—</div></div><div class="metric"><div class="name">Memory</div><div class="val" id="memV">0</div><div class="pass" id="memK">GO 0 • ARM 0 • HOLD 0</div></div></div><div class="actions"><button class="btn black" id="overlayBtn">GO Overlay: ON</button><button class="btn" id="csvBtn">Export CSV</button><button class="btn" id="jsonBtn">Export JSON</button><button class="btn" id="memoryBtn">Export Memory</button><button class="btn red" id="clearMemoryBtn">Clear Memory</button><button class="btn red" id="clearAuditBtn">Clear Audit</button></div></div>
-    <div class="side"><div class="card"><h3 style="margin:0 0 10px">Null Calibration</h3><div class="sysrow"><span>Scramble p(PCS)</span><b id="pPCS">—</b></div><div class="sysrow"><span>Scramble p(Π)</span><b id="pPi">—</b></div><div class="sysrow"><span>Scramble p(SCG)</span><b id="pSCG">—</b></div><div class="sysrow"><span>Null decision</span><b id="nullDecision">—</b></div><div class="small">Full pipeline rerun per null family.</div></div><div class="card"><h3 style="margin:0 0 10px">Memory <small>(last 20)</small></h3><table class="memtable"><thead><tr><th>Time</th><th>Verdict</th><th>Conf%</th><th>PCS</th><th>Π</th><th>SCG</th></tr></thead><tbody id="memoryRows"></tbody></table></div><div class="card"><h3 style="margin:0 0 10px">Channel Weights</h3><div class="sysrow"><span>Price</span><b id="chPrice">—</b></div><div class="sysrow"><span>Volume</span><b id="chVolume">—</b></div><div class="sysrow"><span>High-Low Range</span><b id="chRange">—</b></div><div class="sysrow"><span>Return</span><b id="chReturn">—</b></div><div class="sysrow"><span>Volatility</span><b id="chVolatility">—</b></div></div><div class="card"><h3 style="margin:0 0 10px">Model</h3><div class="sysrow"><span>Model version</span><b>5.1.0</b></div><div class="small">Phase B.1 — Mathematical Core</div></div><div class="card"><h3 style="margin:0 0 10px">Adaptive Memory</h3><div class="sysrow"><span>Nearest cases</span><b id="nearCases">—</b></div><div class="sysrow"><span>Memory verdict</span><b id="memVerdict">—</b></div><div class="sysrow"><span>Memory confidence</span><b id="memConf">—</b></div><div class="sysrow"><span>Memory guard</span><b id="memGuard">—</b></div><div class="small" id="memExplain" style="margin-top:10px">Uses stored decisions to stabilize new decisions.</div></div><div class="card"><h3 style="margin:0 0 10px">System Check</h3><div class="sysrow"><span>Worker</span><b id="chkWorker">—</b></div><div class="sysrow"><span>Data Feed</span><b id="chkFeed">—</b></div><div class="sysrow"><span>OPS Engine</span><b id="chkOps">OK</b></div><div class="sysrow"><span>Null Calibration</span><b id="chkNull">OK</b></div><div class="sysrow"><span>Market Gate</span><b id="chkGate">OK</b></div><div class="sysrow"><span>Memory</span><b id="chkMemory">OK</b></div><div class="sysrow"><span>Audit Log</span><b id="chkAudit">OK</b></div><div class="sysrow"><span>Channels</span><b id="chkChannels">5</b></div><div class="sysrow"><span>Sampling</span><b id="chkSampling">—</b></div></div></div></div>
+    <div class="side"><div class="card"><h3 style="margin:0 0 10px">Null Calibration</h3><div class="sysrow"><span>Scramble p(PCS)</span><b id="pPCS">—</b></div><div class="sysrow"><span>Scramble p(Π)</span><b id="pPi">—</b></div><div class="sysrow"><span>Scramble p(SCG)</span><b id="pSCG">—</b></div><div class="sysrow"><span>Null decision</span><b id="nullDecision">—</b></div><div class="small">Full pipeline rerun per null family.</div></div><div class="card"><h3 style="margin:0 0 10px">Memory <small>(last 20)</small></h3><table class="memtable"><thead><tr><th>Time</th><th>Verdict</th><th>Conf%</th><th>PCS</th><th>Π</th><th>SCG</th></tr></thead><tbody id="memoryRows"></tbody></table></div><div class="card"><h3 style="margin:0 0 10px">Channel Weights</h3><div class="sysrow"><span>Price</span><b id="chPrice">—</b></div><div class="sysrow"><span>Volume</span><b id="chVolume">—</b></div><div class="sysrow"><span>High-Low Range</span><b id="chRange">—</b></div><div class="sysrow"><span>Return</span><b id="chReturn">—</b></div><div class="sysrow"><span>Volatility</span><b id="chVolatility">—</b></div></div><div class="card"><h3 style="margin:0 0 10px">Model</h3><div class="sysrow"><span>Model version</span><b>5.2.0</b></div><div class="small">Phase B.1 — Mathematical Core</div></div><div class="card"><h3 style="margin:0 0 10px">Adaptive Memory</h3><div class="sysrow"><span>Nearest cases</span><b id="nearCases">—</b></div><div class="sysrow"><span>Memory verdict</span><b id="memVerdict">—</b></div><div class="sysrow"><span>Memory confidence</span><b id="memConf">—</b></div><div class="sysrow"><span>Memory guard</span><b id="memGuard">—</b></div><div class="small" id="memExplain" style="margin-top:10px">Uses stored decisions to stabilize new decisions.</div></div><div class="card"><h3 style="margin:0 0 10px">System Check</h3><div class="sysrow"><span>Worker</span><b id="chkWorker">—</b></div><div class="sysrow"><span>Data Feed</span><b id="chkFeed">—</b></div><div class="sysrow"><span>OPS Engine</span><b id="chkOps">OK</b></div><div class="sysrow"><span>Null Calibration</span><b id="chkNull">OK</b></div><div class="sysrow"><span>Market Gate</span><b id="chkGate">OK</b></div><div class="sysrow"><span>Memory</span><b id="chkMemory">OK</b></div><div class="sysrow"><span>Audit Log</span><b id="chkAudit">OK</b></div><div class="sysrow"><span>Channels</span><b id="chkChannels">5</b></div><div class="sysrow"><span>Sampling</span><b id="chkSampling">—</b></div></div></div></div>
 
   <!-- ============================================================ -->
   <!-- LAYERS 0-5 — MULTI-TAB UI -->
@@ -137,16 +137,17 @@
   </div>
 
   <div class="card diag"><div class="diaghead"><h3 style="margin:0">Diagnostics <span class="okbadge">OK</span></h3><button class="btn" id="copyLogBtn">Copy Log</button></div><div id="diagText" style="margin:12px 0;font-size:14px">—</div><pre id="log"></pre></div>
-  <div class="footer"><div><b>🛡 SINTELIA PULSE v5.1</b> • Phase B.1 Mathematical Core • AAPL/VUAA.MI • 5 real channels • No financial advice.</div><button class="btn" onclick="alert('SINTELIA Pulse v5.1 - Phase B.1 Mathematical Core. GO/ARM/HOLD indicates projective structure detection, not financial advice.')">About OPS</button></div>
+  <div class="footer"><div><b>🛡 SINTELIA PULSE v5.2</b> • Phase B.1 Mathematical Core • AAPL/VUAA.MI • 5 real channels • No financial advice.</div><button class="btn" onclick="alert('SINTELIA Pulse v5.2 - Phase B.1 Mathematical Core. GO/ARM/HOLD indicates projective structure detection, not financial advice.')">About OPS</button></div>
 </div>
 
 <script>
 "use strict";
 // ============================================================
-// SINTELIA PULSE v5.1.0 — PHASE B.1 MATHEMATICAL CORE
+// SINTELIA PULSE v5.2.0 — PHASE B.1 MATHEMATICAL CORE
 // ============================================================
 // Layer 1 (OPS) remains UNCHANGED from v4.2
 // Phase B.1: 9 models, full metrics, AIC/BIC, model ranking
+// Fixed: non-linear models with clamping, NaN/Infinity protection
 // ============================================================
 
 // ============================================================
@@ -155,7 +156,7 @@
 const CONFIG={
   API:'https://aged-recipe-f70e.fuffy1603.workers.dev',
   SYMBOL:'AAPL',
-  VERSION:'SINTELIA_PULSE_v5.1.0',
+  VERSION:'SINTELIA_PULSE_v5.2.0',
   POLL_MS:30000,
   K_MEMORY:'SINTELIA_PULSE_V4_MEMORY',
   K_AUDIT:'SINTELIA_PULSE_V4_AUDIT',
@@ -290,6 +291,12 @@ const DataQuality = {
 // LAYER 2 — FINANCIAL GEOMETRY (PHASE B.1 — MATHEMATICAL CORE)
 // ============================================================
 const FinancialGeometry = {
+  // --- Safe log with clamping ---
+  safeLog: (v, minVal = 1e-10, maxVal = 1e10) => {
+    const clamped = Math.max(minVal, Math.min(maxVal, v));
+    return Math.log(clamped);
+  },
+  
   // --- Core fitting functions ---
   fitLinear: (x, y) => {
     const n = x.length;
@@ -314,14 +321,12 @@ const FinancialGeometry = {
   
   fitPolynomial: (x, y, degree) => {
     const n = x.length;
-    // Vandermonde matrix
     const X = [];
     for (let i = 0; i < n; i++) {
       const row = [];
       for (let d = 0; d <= degree; d++) row.push(Math.pow(x[i], d));
       X.push(row);
     }
-    // Normal equations
     const XtX = Array.from({length: degree+1}, () => Array(degree+1).fill(0));
     const XtY = Array(degree+1).fill(0);
     for (let i = 0; i < n; i++) {
@@ -332,7 +337,6 @@ const FinancialGeometry = {
         XtY[d1] += X[i][d1] * y[i];
       }
     }
-    // Gaussian elimination for degree <= 3
     const coeff = Array(degree+1).fill(0);
     if (degree === 1) {
       const a = XtX[0][0], b = XtX[0][1];
@@ -372,7 +376,6 @@ const FinancialGeometry = {
         [sx3, sx4, sx5, sx6]
       ];
       const bvec = [sy, sxy, sx2y, sx3y];
-      // Gaussian elimination
       for (let i = 0; i < 4; i++) {
         let max = Math.abs(M[i][i]);
         let maxRow = i;
@@ -411,20 +414,29 @@ const FinancialGeometry = {
     return { coeff, pred, r2, adjR2, rmse, mae, medae, aic, bic, rss };
   },
 
-  // --- Non-linear models (Logistic, Gompertz, Power Law, Saturation) ---
+  // --- Non-linear models (with safe clamping) ---
   fitLogistic: (x, y) => {
     const n = x.length;
     if (n < 5) return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
-    const yMin = Math.min(...y);
     const yMax = Math.max(...y);
+    const yMin = Math.min(...y);
     const yRange = yMax - yMin;
     if (yRange < 1e-12) return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
-    // Simple logistic: y = L / (1 + exp(-k*(x - x0)))
-    // Transform: log((L-y)/y) = -k*x + k*x0
     const L = yMax * 1.05;
-    const yLog = y.map(v => Math.log((L - v) / Math.max(v, 0.001)));
+    // Safe log transform: clamp ratio to avoid NaN
+    const yLog = y.map(v => {
+      const numerator = L - v;
+      const denominator = Math.max(v, 0.001);
+      const ratio = numerator / denominator;
+      const clamped = Math.max(0.001, Math.min(1000, ratio));
+      return Math.log(clamped);
+    });
     const xLog = x.map(v => v);
     const lin = FinancialGeometry.fitLinear(xLog, yLog);
+    // Check if fit succeeded
+    if (lin.rss === 0 || !isFinite(lin.a) || !isFinite(lin.b)) {
+      return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
+    }
     const k = -lin.a;
     const x0 = lin.b / lin.a;
     const pred = y.map((v,i) => L / (1 + Math.exp(-k * (x[i] - x0))));
@@ -443,19 +455,23 @@ const FinancialGeometry = {
   fitGompertz: (x, y) => {
     const n = x.length;
     if (n < 5) return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
-    const yMin = Math.min(...y);
     const yMax = Math.max(...y);
+    const yMin = Math.min(...y);
     const yRange = yMax - yMin;
     if (yRange < 1e-12) return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
-    // Gompertz: y = a * exp(-b * exp(-c*x))
-    // Transform: log(-log(y/a)) = log(b) - c*x
     const a = yMax * 1.1;
+    // Safe: clamp ratio between 0.001 and 0.999
     const yLog = y.map(v => {
-      const ratio = Math.max(v / a, 0.001);
-      return Math.log(-Math.log(ratio));
+      const ratio = Math.max(0.001, Math.min(0.999, v / a));
+      const inner = -Math.log(ratio);
+      if (inner <= 0) return -10;
+      return Math.log(inner);
     });
     const xLog = x.map(v => v);
     const lin = FinancialGeometry.fitLinear(xLog, yLog);
+    if (lin.rss === 0 || !isFinite(lin.a) || !isFinite(lin.b)) {
+      return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
+    }
     const c = -lin.a;
     const logb = lin.b;
     const b = Math.exp(logb);
@@ -480,6 +496,9 @@ const FinancialGeometry = {
     const lnX = xPos.map(v => Math.log(v));
     const lnY = yPos.map(v => Math.log(v));
     const lin = FinancialGeometry.fitLinear(lnX, lnY);
+    if (lin.rss === 0 || !isFinite(lin.a) || !isFinite(lin.b)) {
+      return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
+    }
     const a = Math.exp(lin.b);
     const b = lin.a;
     const pred = y.map((v,i) => a * Math.pow(xPos[i], b));
@@ -498,15 +517,19 @@ const FinancialGeometry = {
   fitSaturation: (x, y) => {
     const n = x.length;
     if (n < 5) return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
-    // Saturation: y = a * (1 - exp(-b*x))
     const yMax = Math.max(...y);
     if (yMax < 1e-12) return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
-    // Transform: log(1 - y/a) = -b*x
-    // Use a = max(y) * 1.05 as initial
     const a0 = yMax * 1.05;
-    const yLog = y.map(v => Math.log(1 - Math.max(v / a0, 0.001)));
+    // Safe: clamp ratio between 0.001 and 0.999
+    const yLog = y.map(v => {
+      const ratio = Math.max(0.001, Math.min(0.999, v / a0));
+      return Math.log(1 - ratio);
+    });
     const xLog = x.map(v => v);
     const lin = FinancialGeometry.fitLinear(xLog, yLog);
+    if (lin.rss === 0 || !isFinite(lin.a) || !isFinite(lin.b)) {
+      return { pred: y.map(()=>Utils.avg(y)), r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0, rss: 0 };
+    }
     const b = -lin.a;
     const a = a0;
     const pred = y.map((v,i) => a * (1 - Math.exp(-b * x[i])));
@@ -538,6 +561,7 @@ const FinancialGeometry = {
     return 1 - (1 - r2) * (n - 1) / (n - nParam - 1);
   },
   calcAICBIC: (rss, n, k) => {
+    if (rss < 1e-12) return { aic: -Infinity, bic: -Infinity };
     const logL = -n/2 * (Math.log(2 * Math.PI * rss / n) + 1);
     const aic = -2 * logL + 2 * k;
     const bic = -2 * logL + k * Math.log(n);
@@ -638,7 +662,6 @@ const FinancialGeometry = {
     const x = Array.from({length: n}, (_,i) => i);
     const y = prices;
 
-    // Helper to get model result
     const getResult = (name, result) => ({
       name,
       r2: result.r2 || 0,
@@ -651,10 +674,10 @@ const FinancialGeometry = {
       rss: result.rss || 0
     });
 
-    // Fit all 9 models
     const linear = FinancialGeometry.fitLinear(x, y);
     const poly2 = FinancialGeometry.fitPolynomial(x, y, 2);
     const poly3 = FinancialGeometry.fitPolynomial(x, y, 3);
+    
     const expFit = (() => {
       const lnY = y.map(v => Math.log(Math.max(Math.abs(v), 0.001)));
       const result = FinancialGeometry.fitLinear(x, lnY);
@@ -669,6 +692,7 @@ const FinancialGeometry = {
       const { aic, bic } = FinancialGeometry.calcAICBIC(rss, n, 2);
       return { pred, r2, adjR2, rmse, mae, medae, aic, bic, rss };
     })();
+    
     const logFit = (() => {
       const lnX = x.map(v => Math.log(v+1));
       const result = FinancialGeometry.fitLinear(lnX, y);
@@ -683,6 +707,7 @@ const FinancialGeometry = {
       const { aic, bic } = FinancialGeometry.calcAICBIC(rss, n, 2);
       return { pred, r2, adjR2, rmse, mae, medae, aic, bic, rss };
     })();
+    
     const logistic = FinancialGeometry.fitLogistic(x, y);
     const gompertz = FinancialGeometry.fitGompertz(x, y);
     const powerLaw = FinancialGeometry.fitPowerLaw(x, y);
@@ -700,13 +725,25 @@ const FinancialGeometry = {
       getResult('Saturation', saturation)
     ];
 
-    // Sort by BIC (lowest is best)
-    const sorted = models.map((m, idx) => ({ ...m, idx })).sort((a, b) => a.bic - b.bic);
+    // Filter out invalid models (NaN, Infinity)
+    const validModels = models.filter(m => isFinite(m.bic) && isFinite(m.aic) && m.rss > 0);
+    if (validModels.length === 0) {
+      return {
+        bestFit: 'None',
+        models: models,
+        r2: 0, adjR2: 0, rmse: 0, mae: 0, medae: 0, aic: 0, bic: 0,
+        curvature: 0, slope: 0, acceleration: 0, jerk: 0,
+        inflectionPoints: 0, turningPoints: 0,
+        hurst: 0.5, fractalDimension: 1.5,
+        persistence: 'RANDOM'
+      };
+    }
+
+    const sorted = validModels.sort((a, b) => a.bic - b.bic);
     const best = sorted[0];
     const second = sorted[1] || null;
     const tie = second && (Math.abs(best.bic - second.bic) < 2);
 
-    // Geometry
     const curvature = FinancialGeometry.curvature(y);
     const slope = FinancialGeometry.slope(y);
     const accel = FinancialGeometry.acceleration(y);
@@ -1171,7 +1208,7 @@ class PulseApplication{
     const intel = MarketIntelligence.generate(ops, geom, tech, dq, prices);
     UI.updateLayer4(intel); this._lastIntelligence = intel;
     const report = `
-SINTELIA PULSE v5.1 — Phase B.1 Mathematical Core
+SINTELIA PULSE v5.2 — Phase B.1 Mathematical Core
 ==============================================
 ${new Date().toISOString()} • ${this.symbol} • ${info.exchange}
 
